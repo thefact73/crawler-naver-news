@@ -19,6 +19,7 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
+    "openai": "^4.96.2",
     "puppeteer": "^24.7.2"
   }
 }
