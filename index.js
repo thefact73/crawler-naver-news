@@ -2,6 +2,8 @@ const puppeteer = require('puppeteer');
 
 const naverNewsUrl = 'https://news.naver.com/section/100';
 
+const newsArray = [];
+
 const aTagElement = 'body > div > div#ct_wrap > div.ct_scroll_wrapper > div#newsct > div > div > ul > li > div > div > div.sa_text > a';
 
 (async () => {
@@ -15,9 +17,26 @@ const aTagElement = 'body > div > div#ct_wrap > div.ct_scroll_wrapper > div#news
     path: 'page-test.jpeg',
   });
 
+  // 2. 헤드라인 별 링크 저장
   const aTagList = await page.$$eval(
     aTagElement,
     ele => ele.map(e => e.href),
   );
   console.log(aTagList);
+
+
+  // 3. 뉴스별 제목, 내용 저장
+  for (const link of aTagList) {
+    await page.goto(link, { waitUntil: 'networkidle2' });
+    const title = await page.$eval(
+      '#title_area > span',
+      el => el.innerText,
+    );
+    const content = await page.$eval(
+      '#dic_area',
+      el => el.innerText,
+    );
+    newsArray.push({ title, content });
+  }
+  console.log(newsArray);
 })();
