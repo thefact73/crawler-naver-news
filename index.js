@@ -1,5 +1,6 @@
 const puppeteer = require('puppeteer');
 const { OpenAI } = require('openai');
+const fs = require('fs');
 
 const openAi = new OpenAI({
   apiKey: 'API Key',
@@ -60,4 +61,13 @@ const aTagElement = 'body > div > div#ct_wrap > div.ct_scroll_wrapper > div#news
   });
 
   console.log(response.choices[0].message.content);
+
+  // 5. 요약 글 파일로 저장
+  fs.writeFile('summary.md', response.choices[0].message.content, 'utf8', (err) => {
+    if (err) {
+      console.error('파일 쓰기 실패', err);
+      return;
+    }
+    console.log('요약 파일이 생성되었습니다.');
+  });
 })();
