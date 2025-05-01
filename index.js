@@ -6,29 +6,31 @@ const openAi = new OpenAI({
   apiKey: 'API Key',
 });
 
+// 네이버 뉴스 정치 탭
 const naverNewsUrl = 'https://news.naver.com/section/100';
 
 const newsArray = [];
 
+// 헤드라인 요소
 const aTagElement = 'body > div > div#ct_wrap > div.ct_scroll_wrapper > div#newsct > div > div > ul > li > div > div > div.sa_text > a';
 
 (async () => {
+  if (openAi.apiKey === 'API Key') {
+    console.log('ChatGPT API Key를 입력해주세요.');
+    return;
+  }
+
   const brower = await puppeteer.launch({ headless: true });
   const page = await brower.newPage();
 
   // 1. 섹션 페이지로 이동
   await page.goto(naverNewsUrl, { waitUntil: 'networkidle2' });
-  await page.screenshot({
-    fullPage: true,
-    path: 'page-test.jpeg',
-  });
 
   // 2. 헤드라인 별 링크 저장
   const aTagList = await page.$$eval(
     aTagElement,
     ele => ele.map(e => e.href),
   );
-  console.log(aTagList);
 
 
   // 3. 뉴스별 제목, 내용 저장
@@ -44,7 +46,8 @@ const aTagElement = 'body > div > div#ct_wrap > div.ct_scroll_wrapper > div#news
     );
     newsArray.push({ title, content, link });
   }
-  console.log(newsArray);
+
+  await brower.close();
 
   // 4. ChatGPT 에게 요약 요청
   const response = await openAi.chat.completions.create({
@@ -60,8 +63,6 @@ const aTagElement = 'body > div > div#ct_wrap > div.ct_scroll_wrapper > div#news
     temperature: 0.4,
   });
 
-  console.log(response.choices[0].message.content);
-
   // 5. 요약 글 파일로 저장
   fs.writeFile('summary.md', response.choices[0].message.content, 'utf8', (err) => {
     if (err) {
@@ -70,4 +71,6 @@ const aTagElement = 'body > div > div#ct_wrap > div.ct_scroll_wrapper > div#news
     }
     console.log('요약 파일이 생성되었습니다.');
   });
+  
+  return;
 })();
