@@ -6,7 +6,7 @@ const openAi = new OpenAI({
   apiKey: 'API Key',
 });
 
-// 네이버 뉴스 정치 탭
+// 네이버 뉴스 정치 탭..
 const naverNewsUrl = 'https://news.naver.com/section/100';
 
 const newsArray = [];
